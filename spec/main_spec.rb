@@ -1,0 +1,73 @@
+require '../main'
+
+RSpec.describe Chain do
+  describe 'valid?' do
+    context 'only years' do
+        it 'should return true' do
+            periods = Chain.new("16.07.2023", ["2023", "2024", "2025"])
+            expect(periods.valid?).to be_truthy
+        end
+
+        it 'should return false' do
+            periods = Chain.new("24.04.2023", ["2023", "2025", "2026"])
+            expect(periods.valid?).to be_falsey
+        end
+    end
+
+    context 'years and months' do
+        it 'should return true' do
+            periods = Chain.new("31.01.2023", ["2023M1", "2023M2", "2023M3"])
+            expect(periods.valid?).to be_truthy
+        end
+
+        it 'should return false' do
+            periods = Chain.new("10.01.2023", ["2023M1", "2023M3", "2023M4"])
+            expect(periods.valid?).to be_falsey
+        end
+    end
+
+    context 'years, months and days' do
+        it 'should return true' do
+            periods = Chain.new("04.06.1976", ["1976M6D4", "1976M6D5", "1976M6D6"])
+            expect(periods.valid?).to be_truthy
+        end
+
+        it 'should return false' do
+            periods = Chain.new("02.05.2023", ["2023M5D2", "2023M5D3", "2023M5D5"])
+            expect(periods.valid?).to be_falsey
+        end
+    end
+
+    context 'mixed' do
+        it 'should return true' do
+            periods = Chain.new("30.01.2023", ["2023M1", "2023M2", "2023M3D30"])
+            expect(periods.valid?).to be_truthy
+        end
+
+        it 'should return false' do
+            periods = Chain.new("31.01.2023", ["2023M1", "2023M2", "2023M3D30"])
+            expect(periods.valid?).to be_falsey
+        end
+
+        it 'should return true' do
+            periods = Chain.new("30.01.2020", ["2020M1", "2020", "2021", "2022", "2023", "2024M2", "2024M3D30"])
+            expect(periods.valid?).to be_truthy
+        end
+
+        it 'should return false' do
+            periods = Chain.new("30.01.2020", ["2020M1", "2020", "2021", "2022", "2023", "2024M2", "2024M3D29"])
+            expect(periods.valid?).to be_falsey
+        end
+
+        it 'should return true' do
+            periods = Chain.new("30.01.2023", ["2023M1D30", "2023M1", "2023M2", "2023", "2024M3", "2024M4D30", "2024M5"])
+            expect(periods.valid?).to be_truthy
+        end
+
+        it 'should return false' do
+            periods = Chain.new("27.01.2023",["2023M1", "2023M2", "2023M3D28"])
+            expect(periods.valid?).to be_falsey
+        end
+    end
+  end
+end

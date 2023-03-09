@@ -9,7 +9,7 @@ class Chain
         @periods = periods
         @shift = @start_date.day
     end
-public
+
     def valid?
         ##check if the input is correct, then
         results = []
@@ -35,6 +35,34 @@ public
         return results.all?{|res| res == true}
     end
 
+    def add(new_period_type)
+        case new_period_type
+        when "annually"
+            last_date = @periods[-1].split(/M|D/)[0].to_i
+            @periods.push((last_date + 1).to_s)
+            p @periods
+        when "monthly"
+            #case when?
+            last_date = @periods[-1].split(/M|D/).map{|n| n.to_i}
+            date_to_daily = Date.new(last_date[0], last_date[1], 1).next_month
+            @periods.push(date_to_daily.year.to_s + "M" + date_to_daily.month.to_s)
+        when "daily"
+            last_date = @periods[-1].split(/M|D/).map{|n| n.to_i}
+            case last_date.size
+            when 1
+                date_to_daily = Date.new(last_date[0], 1, 1).next_day
+                @periods.push(date_to_daily.year.to_s)
+            when 2
+                date_to_daily = Date.new(last_date[0], last_date[1], @shift).next_day
+                @periods.push(date_to_daily.year.to_s + "M" + date_to_daily.month.to_s)
+            when 3
+                date_to_daily = Date.new(last_date[0], last_date[1], last_date[2]).next_day
+                @periods.push(date_to_daily.year.to_s + "M" + date_to_daily.month.to_s + "D" + date_to_daily.day.to_s)
+            end
+        end
+        @periods
+    end
+
 private
     def start_date_equal?
         date = Date.parse(@start_date)
@@ -53,7 +81,3 @@ private
     end
 
 end
-
-
-periods_chain = Chain.new("30.01.2023", ["2023M1", "2023M2", "2023M3D30"])
-p periods_chain.valid?
